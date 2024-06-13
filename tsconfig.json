@@ -6,9 +6,14 @@
     "strict": true,
     "esModuleInterop": true,
     "declaration": true,
-    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "sourceMap": true,
+    "inlineSources": true
   },
-  "exclude": ["node_modules", "./dist/**"]
+  "ts-node": {
+    "swc": true
+  },
+  "exclude": ["./dist/**"],
+  "include": ["src"]
 }
