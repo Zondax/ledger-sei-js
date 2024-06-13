@@ -17,6 +17,7 @@ import type Transport from "@ledgerhq/hw-transport";
 import Eth from "@ledgerhq/hw-app-eth";
 import BaseApp, { INSGeneric } from "@zondax/ledger-js";
 import { LedgerEthTransactionResolution, LoadConfig } from "@ledgerhq/hw-app-eth/lib/services/types";
+import { CLA } from "./consts";
 
 export class SeiApp extends BaseApp {
   private eth;
@@ -28,7 +29,7 @@ export class SeiApp extends BaseApp {
   };
 
   static _params = {
-    cla: 0x62,
+    cla: CLA,
     ins: { ...SeiApp._INS } as INSGeneric,
     p1Values: { ONLY_RETRIEVE: 0x00 as 0, SHOW_ADDRESS_IN_DEVICE: 0x01 as 1 },
     chunkSize: 250,

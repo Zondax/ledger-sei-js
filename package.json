@@ -25,10 +25,12 @@
     "varint": "^6.0.0"
   },
   "devDependencies": {
+    "@ledgerhq/hw-transport-mocker": "^6.28.6",
     "@ledgerhq/hw-transport": "^6.30.4",
     "@ledgerhq/logs": "^6.10.1",
     "@types/node": "^20.11.5",
     "@types/varint": "^6.0.3",
+    "@types/jest": "29.5.12",
     "@typescript-eslint/eslint-plugin": "^7.0.2",
     "eslint": "^9.4.0",
     "eslint-config-airbnb-base": "^15.0.0",
@@ -46,13 +48,16 @@
     "jest-serial-runner": "^1.2.1",
     "prettier": "^3.3.1",
     "secp256k1": "^5.0.0",
-    "typescript": "5.4.5"
+    "ts-jest": "^29.1.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
   },
   "scripts": {
     "build": "tsc",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "yarn build && jest"
   },
   "publishConfig": {
     "access": "public"
