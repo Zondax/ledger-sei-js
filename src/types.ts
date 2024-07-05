@@ -6,11 +6,18 @@ export interface SeiIns extends INSGeneric {
   SIGN: 0x02;
 }
 
-export interface ResponseAddress {
-  pubkey: Buffer;
-  address: string;
+export interface ResponseBase {
+  error_message: string;
+  return_code: number;
 }
 
-export interface ResponseSign {
-  signature: Buffer;
+export interface GenericeResponseAddress extends ResponseBase {
+  address: string;
+  pubKey: string;
+}
+
+export interface GenericResponseSign extends ResponseBase {
+  r: Buffer;
+  s: Buffer;
+  v: Buffer;
 }
