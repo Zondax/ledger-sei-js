@@ -15,9 +15,10 @@
  ******************************************************************************* */
 import type Transport from "@ledgerhq/hw-transport";
 import Eth from "@ledgerhq/hw-app-eth";
-import BaseApp, { INSGeneric } from "@zondax/ledger-js";
+import BaseApp, { BIP32Path, INSGeneric, processErrorResponse, processResponse } from "@zondax/ledger-js";
 import { LedgerEthTransactionResolution, LoadConfig } from "@ledgerhq/hw-app-eth/lib/services/types";
 import { CLA } from "./consts";
+import { GenericResponseSign, GenericeResponseAddress } from "./types";
 
 export class SeiApp extends BaseApp {
   private eth;
@@ -43,6 +44,69 @@ export class SeiApp extends BaseApp {
     }
 
     this.eth = new Eth(transport, ethScrambleKey, ethLoadConfig);
+  }
+
+  private serializeHrp(hrp?: string): Buffer {
+    if (hrp) {
+      const bufHrp = Buffer.from(hrp, "ascii");
+      return Buffer.concat([Buffer.alloc(1, bufHrp.length), bufHrp]);
+    } else {
+      return Buffer.alloc(1, 0);
+    }
+  }
+
+  async getAddressAndPubKey(
+    path: BIP32Path,
+    showAddrInDevice = false,
+    hrp = "sei",
+  ): Promise<GenericeResponseAddress> {
+    const p1 = showAddrInDevice ? this.P1_VALUES.SHOW_ADDRESS_IN_DEVICE : this.P1_VALUES.ONLY_RETRIEVE;
+    const serializedPath = this.serializePath(path);
+    const serializedHrp = this.serializeHrp(hrp);
+
+    try {
+      const responseBuffer = await this.transport.send(
+        this.CLA,
+        this.INS.GET_ADDR,
+        p1,
+        0,
+        Buffer.concat([serializedHrp, serializedPath]),
+      );
+
+      const response = processResponse(responseBuffer);
+
+      const pubKey = response.readBytes(33).toString("hex");
+      const address = response.readBytes(response.length()).toString("ascii");
+
+      return {
+        pubKey,
+        address,
+        return_code: 0x9000,
+        error_message: "No errors",
+      } as GenericeResponseAddress;
+    } catch (e) {
+      throw processErrorResponse(e);
+    }
+  }
+
+  async sign(path: BIP32Path, message: Buffer): Promise<GenericResponseSign> {
+    const chunks = this.prepareChunks(path, message);
+    try {
+      let result = await this.signSendChunk(SeiApp._INS.SIGN, 1, chunks.length, chunks[0]);
+      for (let i = 1; i < chunks.length; i += 1) {
+        result = await this.signSendChunk(SeiApp._INS.SIGN, 1 + i, chunks.length, chunks[i]);
+      }
+
+      return {
+        r: result.readBytes(32),
+        s: result.readBytes(32),
+        v: result.readBytes(1),
+        return_code: 0x9000,
+        error_message: "No errors",
+      };
+    } catch (e) {
+      throw processErrorResponse(e);
+    }
   }
 
   async signEVMTransaction(

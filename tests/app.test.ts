@@ -18,13 +18,21 @@ import { MockTransport } from "@ledgerhq/hw-transport-mocker";
 import { SeiApp } from "../src";
 import {
   EVM_TRANSFER_BLOB,
+  EXPECTED_ADDRESS,
   EXPECTED_ETH_ADDRESS,
   EXPECTED_ETH_PK,
+  EXPECTED_PK,
+  EXPECTED_R_1_VALUE,
   EXPECTED_R_VALUE,
+  EXPECTED_S_1_VALUE,
   EXPECTED_S_VALUE,
+  EXPECTED_V_1_VALUE,
   EXPECTED_V_VALUE,
   GET_ADDRESS_RESPONSE_APDU,
+  GET_EVM_ADDRESS_RESPONSE_APDU,
   SIGN_EVM_TRANSACTION_RESPONSE_APDU,
+  SIGN_TRANSACTION_RESPONSE_APDU,
+  TRANSFER_BLOB,
 } from "./helper";
 
 const ETH_PATH = "m/44'/60'/0'/0'/5";
@@ -32,7 +40,7 @@ const ETH_PATH = "m/44'/60'/0'/0'/5";
 describe("SeiApp", () => {
   it("Retreive valid EVM public key and address", async () => {
     // Response Payload from getETHAddress with "m/44'/60'/0'/0'/5"
-    const responseBuffer = Buffer.from(GET_ADDRESS_RESPONSE_APDU, "hex");
+    const responseBuffer = Buffer.from(GET_EVM_ADDRESS_RESPONSE_APDU, "hex");
 
     const transport = new MockTransport(responseBuffer);
     const app = new SeiApp(transport);
@@ -53,5 +61,28 @@ describe("SeiApp", () => {
     expect(resp.r.toString()).toEqual(EXPECTED_R_VALUE);
     expect(resp.s.toString()).toEqual(EXPECTED_S_VALUE);
     expect(resp.v.toString()).toEqual(EXPECTED_V_VALUE);
+  });
+
+  it("Retreive valid public key and address", async () => {
+    const responseBuffer = Buffer.from(GET_ADDRESS_RESPONSE_APDU, "hex");
+
+    const transport = new MockTransport(responseBuffer);
+    const app = new SeiApp(transport);
+    const resp = await app.getAddressAndPubKey(ETH_PATH);
+
+    expect(resp.pubKey.toString()).toEqual(EXPECTED_PK);
+    expect(resp.address.toString()).toEqual(EXPECTED_ADDRESS);
+  });
+
+  it("Retreive valid signature", async () => {
+    const responseBuffer = Buffer.from(SIGN_TRANSACTION_RESPONSE_APDU, "hex");
+
+    const transport = new MockTransport(responseBuffer);
+    const app = new SeiApp(transport);
+    const resp = await app.sign(ETH_PATH, Buffer.from(TRANSFER_BLOB, "hex"));
+
+    expect(resp.r.toString("hex")).toEqual(EXPECTED_R_1_VALUE);
+    expect(resp.s.toString("hex")).toEqual(EXPECTED_S_1_VALUE);
+    expect(resp.v.toString("hex")).toEqual(EXPECTED_V_1_VALUE);
   });
 });
