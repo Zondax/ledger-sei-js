@@ -46,32 +46,12 @@ export class SeiApp extends BaseApp {
     this.eth = new Eth(transport, ethScrambleKey, ethLoadConfig);
   }
 
-  private serializeHrp(hrp?: string): Buffer {
-    if (hrp) {
-      const bufHrp = Buffer.from(hrp, "ascii");
-      return Buffer.concat([Buffer.alloc(1, bufHrp.length), bufHrp]);
-    } else {
-      return Buffer.alloc(1, 0);
-    }
-  }
-
-  async getAddressAndPubKey(
-    path: BIP32Path,
-    showAddrInDevice = false,
-    hrp = "sei",
-  ): Promise<GenericeResponseAddress> {
+  async getAddressAndPubKey(path: BIP32Path, showAddrInDevice = false): Promise<GenericeResponseAddress> {
     const p1 = showAddrInDevice ? this.P1_VALUES.SHOW_ADDRESS_IN_DEVICE : this.P1_VALUES.ONLY_RETRIEVE;
     const serializedPath = this.serializePath(path);
-    const serializedHrp = this.serializeHrp(hrp);
 
     try {
-      const responseBuffer = await this.transport.send(
-        this.CLA,
-        this.INS.GET_ADDR,
-        p1,
-        0,
-        Buffer.concat([serializedHrp, serializedPath]),
-      );
+      const responseBuffer = await this.transport.send(this.CLA, this.INS.GET_ADDR, p1, 0, serializedPath);
 
       const response = processResponse(responseBuffer);
 
