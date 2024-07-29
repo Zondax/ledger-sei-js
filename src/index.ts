@@ -98,7 +98,11 @@ export class SeiApp extends BaseApp {
     v: string;
     r: string;
   }> {
-    return this.eth.signTransaction(path, rawTxHex, resolution);
+    try {
+      return await this.eth.signTransaction(path, rawTxHex, resolution);
+    } catch (e) {
+      throw processErrorResponse(e);
+    }
   }
 
   async getEVMAddress(
@@ -110,6 +114,10 @@ export class SeiApp extends BaseApp {
     address: string;
     chainCode?: string;
   }> {
-    return this.eth.getAddress(path, boolDisplay, boolChaincode);
+    try {
+      return await this.eth.getAddress(path, boolDisplay, boolChaincode);
+    } catch (e) {
+      throw processErrorResponse(e);
+    }
   }
 }
