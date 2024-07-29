@@ -16,13 +16,15 @@ Use `yarn install` to avoid issues.
 
 # Available commands
 
-| Operation          | Response                    | Command                     |
-| ------------------ | --------------------------- | --------------------------- |
-| getVersion         | app version                 | ---------------             |
-| appInfo            | name, version, flags, etc   | ---------------             |
-| deviceInfo         | fw and mcu version, id, etc | Only available in dashboard |
-| signETHTransaction | signed message              | path + message              |
-| getETHAddress      | pubkey + address            | path                        |
+| Operation        | Response                    | Command                     |
+| ---------------- | --------------------------- | --------------------------- |
+| getVersion       | app version                 | ---------------             |
+| appInfo          | name, version, flags, etc   | ---------------             |
+| deviceInfo       | fw and mcu version, id, etc | Only available in dashboard |
+| signCosmos       | signed message              | path + message              |
+| getCosmosAddress | pubkey + address            | path                        |
+| signEVM          | signed message              | path + message              |
+| getEVMAddress    | pubkey + address            | path                        |
 
 # Testing with real devices
 

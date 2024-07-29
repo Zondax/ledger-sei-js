@@ -36,15 +36,16 @@ import {
 } from "./helper";
 
 const ETH_PATH = "m/44'/60'/0'/0'/5";
+const WRONG_PATH = "m/44'/70'/0'/0'/5";
 
 describe("SeiApp", () => {
   it("Retreive valid EVM public key and address", async () => {
-    // Response Payload from getETHAddress with "m/44'/60'/0'/0'/5"
+    // Response Payload from getEVMAddress with "m/44'/60'/0'/0'/5"
     const responseBuffer = Buffer.from(GET_EVM_ADDRESS_RESPONSE_APDU, "hex");
 
     const transport = new MockTransport(responseBuffer);
     const app = new SeiApp(transport);
-    const resp = await app.getETHAddress(ETH_PATH);
+    const resp = await app.getEVMAddress(ETH_PATH);
 
     expect(resp.publicKey.toString()).toEqual(EXPECTED_ETH_PK);
     expect(resp.address.toString()).toEqual(EXPECTED_ETH_ADDRESS);
@@ -56,7 +57,7 @@ describe("SeiApp", () => {
 
     const transport = new MockTransport(responseBuffer);
     const app = new SeiApp(transport);
-    const resp = await app.signEVMTransaction(ETH_PATH, Buffer.from(EVM_TRANSFER_BLOB, "hex"));
+    const resp = await app.signEVM(ETH_PATH, EVM_TRANSFER_BLOB);
 
     expect(resp.r.toString()).toEqual(EXPECTED_R_VALUE);
     expect(resp.s.toString()).toEqual(EXPECTED_S_VALUE);
@@ -68,7 +69,7 @@ describe("SeiApp", () => {
 
     const transport = new MockTransport(responseBuffer);
     const app = new SeiApp(transport);
-    const resp = await app.getAddressAndPubKey(ETH_PATH);
+    const resp = await app.getCosmosAddress(ETH_PATH);
 
     expect(resp.pubKey.toString()).toEqual(EXPECTED_PK);
     expect(resp.address.toString()).toEqual(EXPECTED_ADDRESS);
@@ -79,10 +80,23 @@ describe("SeiApp", () => {
 
     const transport = new MockTransport(responseBuffer);
     const app = new SeiApp(transport);
-    const resp = await app.sign(ETH_PATH, Buffer.from(TRANSFER_BLOB, "hex"));
+    const resp = await app.signCosmos(ETH_PATH, Buffer.from(TRANSFER_BLOB, "hex"));
 
     expect(resp.r.toString("hex")).toEqual(EXPECTED_R_1_VALUE);
     expect(resp.s.toString("hex")).toEqual(EXPECTED_S_1_VALUE);
     expect(resp.v.toString("hex")).toEqual(EXPECTED_V_1_VALUE);
+  });
+
+  it("Error processing for invalid path", async () => {
+    const responseBuffer = Buffer.from("6984", "hex");
+
+    const transport = new MockTransport(responseBuffer);
+    const app = new SeiApp(transport);
+
+    try {
+      const resp = await app.getEVMAddress(WRONG_PATH);
+    } catch (e: any) {
+      expect(e.errorMessage).toEqual("Data is invalid");
+    }
   });
 });

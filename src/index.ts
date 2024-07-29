@@ -46,7 +46,7 @@ export class SeiApp extends BaseApp {
     this.eth = new Eth(transport, ethScrambleKey, ethLoadConfig);
   }
 
-  async getAddressAndPubKey(path: BIP32Path, showAddrInDevice = false): Promise<GenericeResponseAddress> {
+  async getCosmosAddress(path: BIP32Path, showAddrInDevice = false): Promise<GenericeResponseAddress> {
     const p1 = showAddrInDevice ? this.P1_VALUES.SHOW_ADDRESS_IN_DEVICE : this.P1_VALUES.ONLY_RETRIEVE;
     const serializedPath = this.serializePath(path);
 
@@ -69,7 +69,7 @@ export class SeiApp extends BaseApp {
     }
   }
 
-  async sign(path: BIP32Path, message: Buffer): Promise<GenericResponseSign> {
+  async signCosmos(path: BIP32Path, message: Buffer): Promise<GenericResponseSign> {
     const chunks = this.prepareChunks(path, message);
     try {
       let result = await this.signSendChunk(SeiApp._INS.SIGN, 1, chunks.length, chunks[0]);
@@ -89,19 +89,23 @@ export class SeiApp extends BaseApp {
     }
   }
 
-  async signEVMTransaction(
+  async signEVM(
     path: string,
-    rawTxHex: any,
+    rawTxHex: string,
     resolution?: LedgerEthTransactionResolution | null,
   ): Promise<{
     s: string;
     v: string;
     r: string;
   }> {
-    return this.eth.signTransaction(path, rawTxHex, resolution);
+    try {
+      return await this.eth.signTransaction(path, rawTxHex, resolution);
+    } catch (e) {
+      throw processErrorResponse(e);
+    }
   }
 
-  async getETHAddress(
+  async getEVMAddress(
     path: string,
     boolDisplay?: boolean,
     boolChaincode?: boolean,
@@ -110,6 +114,10 @@ export class SeiApp extends BaseApp {
     address: string;
     chainCode?: string;
   }> {
-    return this.eth.getAddress(path, boolDisplay, boolChaincode);
+    try {
+      return await this.eth.getAddress(path, boolDisplay, boolChaincode);
+    } catch (e) {
+      throw processErrorResponse(e);
+    }
   }
 }
