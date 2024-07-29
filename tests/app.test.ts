@@ -36,6 +36,7 @@ import {
 } from "./helper";
 
 const ETH_PATH = "m/44'/60'/0'/0'/5";
+const WRONG_PATH = "m/44'/70'/0'/0'/5";
 
 describe("SeiApp", () => {
   it("Retreive valid EVM public key and address", async () => {
@@ -84,5 +85,18 @@ describe("SeiApp", () => {
     expect(resp.r.toString("hex")).toEqual(EXPECTED_R_1_VALUE);
     expect(resp.s.toString("hex")).toEqual(EXPECTED_S_1_VALUE);
     expect(resp.v.toString("hex")).toEqual(EXPECTED_V_1_VALUE);
+  });
+
+  it("Error processing for invalid path", async () => {
+    const responseBuffer = Buffer.from("6984", "hex");
+
+    const transport = new MockTransport(responseBuffer);
+    const app = new SeiApp(transport);
+
+    try {
+      const resp = await app.getEVMAddress(WRONG_PATH);
+    } catch (e: any) {
+      expect(e.errorMessage).toEqual("Data is invalid");
+    }
   });
 });
