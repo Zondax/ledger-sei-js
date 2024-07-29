@@ -91,7 +91,7 @@ export class SeiApp extends BaseApp {
 
   async signEVM(
     path: string,
-    rawTxHex: any,
+    rawTxHex: string,
     resolution?: LedgerEthTransactionResolution | null,
   ): Promise<{
     s: string;

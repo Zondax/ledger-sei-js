@@ -57,7 +57,7 @@ describe("SeiApp", () => {
 
     const transport = new MockTransport(responseBuffer);
     const app = new SeiApp(transport);
-    const resp = await app.signEVM(ETH_PATH, Buffer.from(EVM_TRANSFER_BLOB, "hex"));
+    const resp = await app.signEVM(ETH_PATH, EVM_TRANSFER_BLOB);
 
     expect(resp.r.toString()).toEqual(EXPECTED_R_VALUE);
     expect(resp.s.toString()).toEqual(EXPECTED_S_VALUE);
