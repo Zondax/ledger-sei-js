@@ -21,7 +21,7 @@ import { CLA } from "./consts";
 import { GenericResponseSign, GenericeResponseAddress } from "./types";
 
 export class SeiApp extends BaseApp {
-  private eth;
+  private evm;
 
   static _INS = {
     GET_VERSION: 0x00 as number,
@@ -43,7 +43,7 @@ export class SeiApp extends BaseApp {
       throw new Error("Transport has not been defined");
     }
 
-    this.eth = new Eth(transport, ethScrambleKey, ethLoadConfig);
+    this.evm = new Eth(transport, ethScrambleKey, ethLoadConfig);
   }
 
   async getCosmosAddress(path: BIP32Path, showAddrInDevice = false): Promise<GenericeResponseAddress> {
@@ -99,7 +99,7 @@ export class SeiApp extends BaseApp {
     r: string;
   }> {
     try {
-      return await this.eth.signTransaction(path, rawTxHex, resolution);
+      return await this.evm.signTransaction(path, rawTxHex, resolution);
     } catch (e) {
       throw processErrorResponse(e);
     }
@@ -115,7 +115,7 @@ export class SeiApp extends BaseApp {
     chainCode?: string;
   }> {
     try {
-      return await this.eth.getAddress(path, boolDisplay, boolChaincode);
+      return await this.evm.getAddress(path, boolDisplay, boolChaincode);
     } catch (e) {
       throw processErrorResponse(e);
     }
