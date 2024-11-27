@@ -120,4 +120,8 @@ export class SeiApp extends BaseApp {
       throw processErrorResponse(e);
     }
   }
+
+  async signPersonalMessage(path: string, messageHex: string): Promise<{ v: number; s: string; r: string }> {
+    return this.evm.signPersonalMessage(path, messageHex);
+  }
 }
